@@ -64,7 +64,7 @@ st.title("🎈 Enkripsi dan Dekripsi ECB")
 st.write("Pilih opsi untuk melakukan enkripsi atau dekripsi dan masukkan plaintext serta key.")
 
 # Tata letak kolom
-col1, col2 = st.columns(2)
+col1, col2, col3 = st.columns(3)
 
 with col1:
     st.subheader("Input dan Proses")
@@ -106,15 +106,16 @@ with col1:
             }
 
 with col2:
-    st.subheader("Hasil dan Langkah-langkah")
+    st.subheader("Langkah-langkah")
     if "output" in st.session_state:
         output = st.session_state["output"]
-        st.write(f"**Operasi: {output['operation']}**")
-        st.write("**Langkah-langkah:**")
         for step in output["steps"]:
             st.write(step)
 
-        st.write("**Hasil Akhir:**")
+with col3:
+    st.subheader("Hasil Akhir")
+    if "output" in st.session_state:
+        output = st.session_state["output"]
         if output["operation"] == "Enkripsi":
             st.write("Ciphertext (biner):", output["binary_result"])
             st.write("Ciphertext (Hexadecimal):", output["hex_result"])
@@ -122,4 +123,3 @@ with col2:
             st.write("Decrypted Plaintext (biner):", output["binary_result"])
             st.write("Decrypted Plaintext (teks):", output["text_result"])
             st.write("Decrypted Plaintext (Hexadecimal):", output["hex_result"])
-
