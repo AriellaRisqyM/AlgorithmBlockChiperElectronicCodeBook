@@ -55,9 +55,18 @@ def ecb_decrypt(ciphertext, key):
         decrypted_blocks.append(decrypted)
         process.append(step_info)
 
-    plaintext = ''.join(decrypted_blocks)
+    # Gabungkan semua blok dan hapus padding '0' di bagian akhir
+    plaintext = ''.join(decrypted_blocks).rstrip('0')  # Hapus padding '0'
     plaintext_hex = hex(int(plaintext, 2))[2:].upper()  # Convert final plaintext to hex
-    return plaintext.rstrip('0'), plaintext_hex, process
+    
+    try:
+        # Coba ubah plaintext biner ke teks
+        plaintext_text = binary_to_text(plaintext)
+    except ValueError:
+        plaintext_text = "Invalid binary for text conversion."
+
+    return plaintext_text, plaintext_hex, process
+
 
 # Streamlit Interface
 st.title("Dibuat oleh ARIELLA RISQY MAULANA - A11.2022.14035 & BIMA NUR ABDILLAH - A11.2022.14041")
