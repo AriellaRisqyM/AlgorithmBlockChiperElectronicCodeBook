@@ -125,5 +125,4 @@ with col3:
             st.write("Decrypted Plaintext (teks):", output["text_result"])
             st.write("Decrypted Plaintext (Hexadecimal):", output["hex_result"])
 
-Decrypted Plaintext (teks): arie kenapa huruf terakhir tidak terbaca 
 
