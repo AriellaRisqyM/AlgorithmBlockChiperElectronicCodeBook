@@ -5,10 +5,9 @@ def text_to_binary(text):
     return ''.join(format(ord(char), '08b') for char in text)
 
 def binary_to_text(binary):
-    # Membagi biner menjadi blok 8-bit
     chars = [binary[i:i+8] for i in range(0, len(binary), 8)]
     try:
-        # Pastikan semua byte valid sebelum konversi
+        # Validasi apakah panjang blok valid
         return ''.join(chr(int(char, 2)) for char in chars if len(char) == 8)
     except ValueError:
         return "Invalid binary for text conversion."
@@ -32,7 +31,7 @@ def ecb_encrypt(plaintext, key):
 
     for block in blocks:
         if len(block) < block_size:
-            block = block.ljust(block_size, '0')
+            block = block.zfill(block_size)  # Gunakan zfill untuk padding
         step_info = f"Original Block: {block}"
         encrypted = xor_operation(block, key)
         step_info += f" -> After XOR: {encrypted}"
@@ -60,7 +59,7 @@ def ecb_decrypt(ciphertext, key):
         decrypted_blocks.append(decrypted)
         process.append(step_info)
 
-    plaintext = ''.join(decrypted_blocks).rstrip('0')  # Hapus padding
+    plaintext = ''.join(decrypted_blocks).rstrip('0')  # Hapus padding trailing zero
     plaintext_hex = hex(int(plaintext, 2))[2:].upper() if plaintext else "0"
     plaintext_text = binary_to_text(plaintext)
 
