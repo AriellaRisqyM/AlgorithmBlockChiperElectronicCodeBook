@@ -5,8 +5,13 @@ def text_to_binary(text):
     return ''.join(format(ord(char), '08b') for char in text)
 
 def binary_to_text(binary):
+    # Membagi biner menjadi blok 8-bit
     chars = [binary[i:i+8] for i in range(0, len(binary), 8)]
-    return ''.join(chr(int(char, 2)) for char in chars)
+    try:
+        # Pastikan semua byte valid sebelum konversi
+        return ''.join(chr(int(char, 2)) for char in chars if len(char) == 8)
+    except ValueError:
+        return "Invalid binary for text conversion."
 
 # Fungsi XOR, wrap kiri, dan wrap kanan
 def xor_operation(block, key):
@@ -55,28 +60,26 @@ def ecb_decrypt(ciphertext, key):
         decrypted_blocks.append(decrypted)
         process.append(step_info)
 
-    plaintext = ''.join(decrypted_blocks)
-    plaintext_hex = hex(int(plaintext, 2))[2:].upper()  # Convert final plaintext to hex
-    return plaintext.rstrip('0'), plaintext_hex, process
+    plaintext = ''.join(decrypted_blocks).rstrip('0')  # Hapus padding
+    plaintext_hex = hex(int(plaintext, 2))[2:].upper() if plaintext else "0"
+    plaintext_text = binary_to_text(plaintext)
+
+    return plaintext_text, plaintext_hex, process
 
 # Streamlit Interface
 st.title("🎈 Enkripsi dan Dekripsi ECB")
 st.write("Pilih opsi untuk melakukan enkripsi atau dekripsi dan masukkan plaintext serta key.")
-
 
 # Tata letak kolom
 col1, col2, col3 = st.columns(3)
 
 with col1:
     st.subheader("Input dan Proses")
-    # Input untuk plaintext dan key
     plaintext_input = st.text_input("Masukkan Plaintext (biner atau teks biasa):", "Hello")
     key = st.text_input("Masukkan Key (dalam bentuk biner):", "1010")
 
-    # Pilihan mode: Enkripsi atau Dekripsi
     operation = st.radio("Pilih operasi:", ("Enkripsi", "Dekripsi"))
 
-    # Tombol untuk memproses
     if st.button("Proses"):
         if operation == "Enkripsi":
             if not all(c in '01' for c in plaintext_input):  # Deteksi input teks biasa
@@ -93,16 +96,12 @@ with col1:
             }
 
         elif operation == "Dekripsi":
-            plaintext_binary, plaintext_decrypted_hex, decrypt_process = ecb_decrypt(plaintext_input, key)
-            try:
-                plaintext_decrypted = binary_to_text(plaintext_binary)
-            except ValueError:
-                plaintext_decrypted = "Invalid binary for text conversion."
+            plaintext_text, plaintext_hex, decrypt_process = ecb_decrypt(plaintext_input, key)
             st.session_state["output"] = {
                 "steps": decrypt_process,
-                "binary_result": plaintext_binary,
-                "text_result": plaintext_decrypted,
-                "hex_result": plaintext_decrypted_hex,
+                "binary_result": plaintext_input,
+                "text_result": plaintext_text,
+                "hex_result": plaintext_hex,
                 "operation": "Dekripsi",
             }
 
@@ -124,5 +123,3 @@ with col3:
             st.write("Decrypted Plaintext (biner):", output["binary_result"])
             st.write("Decrypted Plaintext (teks):", output["text_result"])
             st.write("Decrypted Plaintext (Hexadecimal):", output["hex_result"])
-
-
