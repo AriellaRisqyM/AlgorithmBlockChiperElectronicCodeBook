@@ -5,9 +5,6 @@ def text_to_binary(text):
     return ''.join(format(ord(char), '08b') for char in text)
 
 def binary_to_text(binary):
-    # Pastikan panjang biner kelipatan 8
-    if len(binary) % 8 != 0:
-        binary = binary.ljust(len(binary) + (8 - len(binary) % 8), '0')
     chars = [binary[i:i+8] for i in range(0, len(binary), 8)]
     return ''.join(chr(int(char, 2)) for char in chars)
 
@@ -58,22 +55,14 @@ def ecb_decrypt(ciphertext, key):
         decrypted_blocks.append(decrypted)
         process.append(step_info)
 
-    plaintext = ''.join(decrypted_blocks).rstrip('0')  # Hapus padding '0'
-    plaintext_hex = hex(int(plaintext, 2))[2:].upper() if plaintext else "0"
-    
-    try:
-        plaintext_text = binary_to_text(plaintext)
-    except ValueError:
-        plaintext_text = "Invalid binary for text conversion."
-
-    return plaintext_text, plaintext_hex, process
+    plaintext = ''.join(decrypted_blocks)
+    plaintext_hex = hex(int(plaintext, 2))[2:].upper()  # Convert final plaintext to hex
+    return plaintext.rstrip('0'), plaintext_hex, process
 
 # Streamlit Interface
-st.title("Dibuat oleh ARIELLA RISQY MAULANA - A11.2022.14035 & BIMA NUR ABDILLAH - A11.2022.14041")
-st.write("TUGAS KRIPTOGRAFI A11.4509")
-
 st.title("🎈 Enkripsi dan Dekripsi ECB")
 st.write("Pilih opsi untuk melakukan enkripsi atau dekripsi dan masukkan plaintext serta key.")
+
 
 # Tata letak kolom
 col1, col2, col3 = st.columns(3)
@@ -104,12 +93,16 @@ with col1:
             }
 
         elif operation == "Dekripsi":
-            plaintext_text, plaintext_hex, decrypt_process = ecb_decrypt(plaintext_input, key)
+            plaintext_binary, plaintext_decrypted_hex, decrypt_process = ecb_decrypt(plaintext_input, key)
+            try:
+                plaintext_decrypted = binary_to_text(plaintext_binary)
+            except ValueError:
+                plaintext_decrypted = "Invalid binary for text conversion."
             st.session_state["output"] = {
                 "steps": decrypt_process,
-                "binary_result": plaintext_input,
-                "text_result": plaintext_text,
-                "hex_result": plaintext_hex,
+                "binary_result": plaintext_binary,
+                "text_result": plaintext_decrypted,
+                "hex_result": plaintext_decrypted_hex,
                 "operation": "Dekripsi",
             }
 
@@ -131,3 +124,6 @@ with col3:
             st.write("Decrypted Plaintext (biner):", output["binary_result"])
             st.write("Decrypted Plaintext (teks):", output["text_result"])
             st.write("Decrypted Plaintext (Hexadecimal):", output["hex_result"])
+
+Decrypted Plaintext (teks): arie kenapa huruf terakhir tidak terbaca 
+
