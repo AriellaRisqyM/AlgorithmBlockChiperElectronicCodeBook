@@ -65,10 +65,11 @@ def ecb_decrypt(ciphertext, key):
     return plaintext_text, plaintext_hex, process
 
 # Streamlit Interface
-st.title("Dibuat oleh ARIELLA RISQY MAULANA - A11.2022.14035 & BIMA NUR ABDILLAH - A11.2022.14041")
-st.write("TUGAS KRIPTOGRAFI A11.4509")
+
 
 st.title("🎈 Enkripsi dan Dekripsi ECB")
+st.write("Dibuat oleh ARIELLA RISQY MAULANA - A11.2022.14035 & BIMA NUR ABDILLAH - A11.2022.14041")
+st.write("TUGAS KRIPTOGRAFI A11.4509")
 st.write("Pilih opsi untuk melakukan enkripsi atau dekripsi dan masukkan plaintext serta key.")
 
 # Tata letak horizontal
