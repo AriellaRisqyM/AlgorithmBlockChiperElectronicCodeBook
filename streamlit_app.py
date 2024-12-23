@@ -8,7 +8,7 @@ def binary_to_text(binary):
     chars = [binary[i:i+8] for i in range(0, len(binary), 8)]
     return ''.join(chr(int(char, 2)) for char in chars)
 
-# Fungsi XOR, wrap kiri, dan wrap kanan yang sudah ada
+# Fungsi XOR, wrap kiri, dan wrap kanan
 def xor_operation(block, key):
     return ''.join(str(int(b) ^ int(k)) for b, k in zip(block, key))
 
@@ -63,37 +63,63 @@ def ecb_decrypt(ciphertext, key):
 st.title("🎈 Enkripsi dan Dekripsi ECB")
 st.write("Pilih opsi untuk melakukan enkripsi atau dekripsi dan masukkan plaintext serta key.")
 
-# Input untuk plaintext dan key
-plaintext_input = st.text_input("Masukkan Plaintext (biner atau teks biasa):", "Hello")
-key = st.text_input("Masukkan Key (dalam bentuk biner):", "1010")
+# Tata letak kolom
+col1, col2 = st.columns(2)
 
-# Pilihan mode: Enkripsi atau Dekripsi
-operation = st.radio("Pilih operasi:", ("Enkripsi", "Dekripsi"))
+with col1:
+    st.subheader("Input dan Proses")
+    # Input untuk plaintext dan key
+    plaintext_input = st.text_input("Masukkan Plaintext (biner atau teks biasa):", "Hello")
+    key = st.text_input("Masukkan Key (dalam bentuk biner):", "1010")
 
-# Tombol untuk memproses
-if st.button("Proses"):
-    if operation == "Enkripsi":
-        if not all(c in '01' for c in plaintext_input):  # Deteksi input teks biasa
-            plaintext_binary = text_to_binary(plaintext_input)
-        else:
-            plaintext_binary = plaintext_input
+    # Pilihan mode: Enkripsi atau Dekripsi
+    operation = st.radio("Pilih operasi:", ("Enkripsi", "Dekripsi"))
 
-        ciphertext, ciphertext_hex, encrypt_process = ecb_encrypt(plaintext_binary, key)
-        st.subheader("Langkah-langkah Enkripsi:")
-        for step in encrypt_process:
+    # Tombol untuk memproses
+    if st.button("Proses"):
+        if operation == "Enkripsi":
+            if not all(c in '01' for c in plaintext_input):  # Deteksi input teks biasa
+                plaintext_binary = text_to_binary(plaintext_input)
+            else:
+                plaintext_binary = plaintext_input
+
+            ciphertext, ciphertext_hex, encrypt_process = ecb_encrypt(plaintext_binary, key)
+            st.session_state["output"] = {
+                "steps": encrypt_process,
+                "binary_result": ciphertext,
+                "hex_result": ciphertext_hex,
+                "operation": "Enkripsi",
+            }
+
+        elif operation == "Dekripsi":
+            plaintext_binary, plaintext_decrypted_hex, decrypt_process = ecb_decrypt(plaintext_input, key)
+            try:
+                plaintext_decrypted = binary_to_text(plaintext_binary)
+            except ValueError:
+                plaintext_decrypted = "Invalid binary for text conversion."
+            st.session_state["output"] = {
+                "steps": decrypt_process,
+                "binary_result": plaintext_binary,
+                "text_result": plaintext_decrypted,
+                "hex_result": plaintext_decrypted_hex,
+                "operation": "Dekripsi",
+            }
+
+with col2:
+    st.subheader("Hasil dan Langkah-langkah")
+    if "output" in st.session_state:
+        output = st.session_state["output"]
+        st.write(f"**Operasi: {output['operation']}**")
+        st.write("**Langkah-langkah:**")
+        for step in output["steps"]:
             st.write(step)
-        st.write("\nCiphertext (biner):", ciphertext)
-        st.write("Ciphertext (Hexadecimal):", ciphertext_hex)
 
-    elif operation == "Dekripsi":
-        plaintext_binary, plaintext_decrypted_hex, decrypt_process = ecb_decrypt(plaintext_input, key)
-        try:
-            plaintext_decrypted = binary_to_text(plaintext_binary)
-        except ValueError:
-            plaintext_decrypted = "Invalid binary for text conversion."
-        st.subheader("Langkah-langkah Dekripsi:")
-        for step in decrypt_process:
-            st.write(step)
-        st.write("\nDecrypted Plaintext (biner):", plaintext_binary)
-        st.write("Decrypted Plaintext (teks):", plaintext_decrypted)
-        st.write("Decrypted Plaintext (Hexadecimal):", plaintext_decrypted_hex)
+        st.write("**Hasil Akhir:**")
+        if output["operation"] == "Enkripsi":
+            st.write("Ciphertext (biner):", output["binary_result"])
+            st.write("Ciphertext (Hexadecimal):", output["hex_result"])
+        elif output["operation"] == "Dekripsi":
+            st.write("Decrypted Plaintext (biner):", output["binary_result"])
+            st.write("Decrypted Plaintext (teks):", output["text_result"])
+            st.write("Decrypted Plaintext (Hexadecimal):", output["hex_result"])
+
