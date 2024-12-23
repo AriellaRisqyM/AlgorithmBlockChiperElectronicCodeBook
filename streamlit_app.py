@@ -62,6 +62,8 @@ def ecb_decrypt(ciphertext, key):
 # Streamlit Interface
 st.title("🎈 Enkripsi dan Dekripsi ECB")
 st.write("Pilih opsi untuk melakukan enkripsi atau dekripsi dan masukkan plaintext serta key.")
+st.title("Dibuat oleh ARIELLA RISQY MAULANA - A11.2022.14035 & BIMA NUR ABDILLAH -A11.2022.14041")
+st.write("TUGAS KRIPTOGRAFI A11.4509")
 
 # Tata letak kolom
 col1, col2, col3 = st.columns(3)
